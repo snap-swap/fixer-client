@@ -1,10 +1,10 @@
-package vc.snapswap.fixer
+package com.snapswap.fixer
 
 import org.joda.time.DateTime
-import vc.snapswap.fixer.error.FixerAPIError
-import vc.snapswap.fixer.model.FxData
+import com.snapswap.fixer.error.FixerAPIError
+import com.snapswap.fixer.model.FxData
 import spray.json._
-import vc.snapswap.fixer.FixerUnmarshaller._
+import com.snapswap.fixer.FixerUnmarshaller._
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.concurrent.ScalaFutures
 

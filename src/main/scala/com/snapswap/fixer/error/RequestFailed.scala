@@ -1,4 +1,4 @@
-package vc.snapswap.fixer.error
+package com.snapswap.fixer.error
 
 import scala.util.control.NoStackTrace
 

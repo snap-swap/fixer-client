@@ -1,4 +1,4 @@
-package vc.snapswap.fixer
+package com.snapswap.fixer
 
 import akka.actor.ActorSystem
 import akka.event.Logging
@@ -10,10 +10,10 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source, Flow}
 import org.joda.time.{DateTimeZone, DateTime}
 import spray.json.JsValue
-import vc.snapswap.fixer.error.{UnexpectedResponse, RequestFailed}
+import com.snapswap.fixer.error.{UnexpectedResponse, RequestFailed}
 import spray.json._
-import vc.snapswap.fixer.FixerUnmarshaller._
-import vc.snapswap.fixer.model.FxData
+import com.snapswap.fixer.FixerUnmarshaller._
+import com.snapswap.fixer.model.FxData
 import scala.concurrent.Future
 
 class FixerClientImpl()(implicit val system: ActorSystem, val materializer: Materializer) extends FixerClient {
@@ -36,7 +36,7 @@ class FixerClientImpl()(implicit val system: ActorSystem, val materializer: Mate
           rates = Map()
         ))
     } else {
-      import vc.snapswap.fixer.FixerUnmarshaller._
+      import com.snapswap.fixer.FixerUnmarshaller._
 
       get("latest", Map("base" -> base, "symbols" -> counters.mkString(","))) { json =>
         if (json.convertTo[FxData].currencies == counters + base) {

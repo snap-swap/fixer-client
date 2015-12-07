@@ -1,4 +1,4 @@
-package vc.snapswap.fixer.model
+package com.snapswap.fixer.model
 
 import org.joda.time.DateTime
 

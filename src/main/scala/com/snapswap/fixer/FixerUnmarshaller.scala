@@ -1,11 +1,15 @@
-package vc.snapswap.fixer
+package com.snapswap.fixer
 
 import org.joda.time.format.DateTimeFormat
-import spray.json._
-import vc.snapswap.fixer.error.{FixerAPIError, UnexpectedResponse}
-import vc.snapswap.fixer.model.FxData
+import spray.json.{DefaultJsonProtocol, JsObject, JsValue, JsonReader}
+import com.snapswap.fixer.error.{FixerAPIError, UnexpectedResponse}
+import com.snapswap.fixer.model.FxData
+
 import scala.util.{Failure, Success, Try}
 
+/**
+  * Created by greenhost on 07/12/15.
+  */
 private[fixer] object FixerUnmarshaller extends DefaultJsonProtocol {
 
   case class FixerErrorRaw(error: String)

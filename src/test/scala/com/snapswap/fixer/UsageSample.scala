@@ -1,12 +1,12 @@
-package vc.snapswap.fixer
+package com.snapswap.fixer
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Matchers, WordSpecLike}
-import vc.snapswap.fixer.error.FixerAPIError
-import vc.snapswap.fixer.model.FxData
+import com.snapswap.fixer.error.FixerAPIError
+import com.snapswap.fixer.model.FxData
 
 class UsageSample
   extends WordSpecLike
