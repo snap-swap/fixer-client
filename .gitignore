@@ -1,0 +1,22 @@
+*.log
+dist/*
+
+# SBT
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# IDE
+.idea/
+.idea_modules/
+/.classpath
+/.project
+/.settings
+/.cache
+/*.iml
+.scala_dependencies
+
+# intellij idea migration files
+/*/projectFilesBackup/

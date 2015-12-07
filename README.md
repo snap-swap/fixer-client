@@ -1,2 +1,2 @@
 # fixer-client
-fixer-client impl
+Akka-streams client implementation for http://api.fixer.io
