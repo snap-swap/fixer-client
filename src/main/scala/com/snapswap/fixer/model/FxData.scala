@@ -2,7 +2,7 @@ package com.snapswap.fixer.model
 
 import org.joda.time.DateTime
 
-case class FxData(asOf: DateTime, private[fixer] val base: String, private[fixer] val rates: Map[String, BigDecimal]) {
+case class FxData(asOf: DateTime, base: String, rates: Map[String, BigDecimal]) {
   override def toString = {
     if (rates.isEmpty) {
       s"empty FX rates as of [$asOf]"
