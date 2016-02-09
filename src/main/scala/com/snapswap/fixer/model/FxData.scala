@@ -35,20 +35,4 @@ case class FxData(asOf: DateTime, private[fixer] val base: String, private[fixer
       rates.keySet + base
     }
   }
-
-  def all: Map[(String, String), BigDecimal] = {
-    if (rates.isEmpty) {
-      Map.empty[(String, String), BigDecimal]
-    } else {
-      currencies
-        .flatMap(left => currencies.filterNot(_ == left).map(right => (left, right)))
-        .map { case (left, right) =>
-          val r = rate(left, right)
-
-          require(r.isDefined, s"[$left$right] rate is not found in [$toString]")
-
-          (left, right) -> r.get
-        }.toMap
-    }
-  }
 }

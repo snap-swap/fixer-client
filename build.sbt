@@ -2,7 +2,7 @@ name := "fixer-client"
 
 organization := "com.snapswap"
 
-version := "0.1.0"
+version := "0.1.1"
 
 scalaVersion := "2.11.7"
 

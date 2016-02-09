@@ -27,14 +27,6 @@ class FixerUnmarshallerSpec
         )
       )
       result.currencies shouldBe Set("USD", "GBP", "EUR")
-      result.all shouldBe Map(
-        ("USD", "EUR") -> 0.8,
-        ("USD", "GBP") -> 0.5,
-        ("EUR", "USD") -> 1.25,
-        ("GBP", "USD") -> 2,
-        ("GBP", "EUR") -> 1.6,
-        ("EUR", "GBP") -> 0.625
-      )
     }
     "parse error response" in {
       val str = """{"error":"Invalid base"}"""
