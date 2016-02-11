@@ -2,19 +2,21 @@ package com.snapswap.fixer
 
 import akka.actor.ActorSystem
 import akka.event.Logging
+import akka.http.ConnectionPoolSettings
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.client.RequestBuilding._
-import akka.http.scaladsl.model.{HttpResponse, HttpRequest}
+import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
-import akka.stream.scaladsl.{Sink, Source, Flow}
-import org.joda.time.{DateTimeZone, DateTime}
-import spray.json.JsValue
-import com.snapswap.fixer.error.{UnexpectedResponse, RequestFailed}
-import spray.json._
-import com.snapswap.fixer.FixerUnmarshaller._
+import akka.stream.scaladsl.{Sink, Source}
+import com.snapswap.fixer.error.{RequestFailed, UnexpectedResponse}
 import com.snapswap.fixer.model.FxData
+import org.joda.time.{DateTime, DateTimeZone}
+import spray.json.{JsValue, _}
+
 import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 class FixerClientImpl()(implicit val system: ActorSystem, val materializer: Materializer) extends FixerClient {
 
@@ -24,8 +26,10 @@ class FixerClientImpl()(implicit val system: ActorSystem, val materializer: Mate
 
   protected val baseURL = "/"
 
-  private lazy val fixerConnectionFlow: Flow[HttpRequest, HttpResponse, Any] =
-    Http().outgoingConnection("api.fixer.io", 80).log("fixer")
+  private lazy val fixerConnectionFlow =
+    Http()
+      .cachedHostConnectionPool[Unit]("api.fixer.io", 80, settings = ConnectionPoolSettings.create(system))
+      .log("fixer")
 
   override def latestRates(base: String, counters: Set[String]): Future[FxData] = {
     if (counters.isEmpty) {
@@ -49,7 +53,12 @@ class FixerClientImpl()(implicit val system: ActorSystem, val materializer: Mate
   }
 
   private def makeRequest(request: HttpRequest): Future[HttpResponse] =
-    Source.single(request).via(fixerConnectionFlow).runWith(Sink.head)
+    Source
+      .single(request -> (()))
+      .via(fixerConnectionFlow).mapAsync(1) {
+      case (Success(resp), _) => resp.toStrict(1.second)
+      case (Failure(ex), _) => Future.failed[HttpResponse](ex)
+    }.runWith(Sink.head)
 
   private def get[T](path: String, query: Map[String, String])(parser: JsValue => T): Future[T] = {
     val url = baseURL + path + parameters(query)
