@@ -2,10 +2,10 @@ package com.snapswap.fixer
 
 import akka.actor.ActorSystem
 import akka.event.Logging
-import akka.http.ConnectionPoolSettings
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.client.RequestBuilding._
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
+import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
@@ -28,7 +28,7 @@ class FixerClientImpl()(implicit val system: ActorSystem, val materializer: Mate
 
   private lazy val fixerConnectionFlow =
     Http()
-      .cachedHostConnectionPool[Unit]("api.fixer.io", 80, settings = ConnectionPoolSettings.create(system))
+      .cachedHostConnectionPool[Unit]("api.fixer.io", 80, settings = ConnectionPoolSettings(system.settings.config))
       .log("fixer")
 
   override def latestRates(base: String, counters: Set[String]): Future[FxData] = {

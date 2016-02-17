@@ -2,7 +2,7 @@ name := "fixer-client"
 
 organization := "com.snapswap"
 
-version := "0.1.3"
+version := "0.1.4"
 
 scalaVersion := "2.11.7"
 
@@ -14,14 +14,13 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
-  val akkaStreamV = "2.0-M2"
+  val akkaV = "2.4.2"
   Seq(
-    "com.typesafe.akka" %% "akka-http-core-experimental" % akkaStreamV,
-    "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaStreamV,
-    "joda-time" % "joda-time" % "2.8.1",
-    "org.joda" % "joda-convert" % "1.7",
-    "org.scalatest" %% "scalatest" % "2.2.5" % "test",
-    "com.typesafe.akka" %% "akka-stream-experimental" % akkaStreamV % "test"
+    "com.typesafe.akka" %% "akka-http-core" % akkaV,
+    "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaV,
+    "joda-time" % "joda-time" % "2.9.1",
+    "org.joda" % "joda-convert" % "1.8.1",
+    "org.scalatest" %% "scalatest" % "2.2.5" % "test"
   )
 }
 
