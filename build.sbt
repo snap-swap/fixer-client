@@ -2,11 +2,27 @@ name := "fixer-client"
 
 organization := "com.snapswap"
 
-version := "0.1.4"
+version := "1.0.0"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
-scalacOptions := Seq("-feature", "-unchecked", "-deprecation", "-encoding", "UTF-8")
+scalacOptions := Seq(
+  "-feature",
+  "-unchecked",
+  "-deprecation",
+  "-language:existentials",
+  "-language:higherKinds",
+  "-language:implicitConversions",
+  "-Xfatal-warnings",
+  "-Xlint",
+  "-Yno-adapted-args",
+  "-Ywarn-dead-code",
+  "-Ywarn-numeric-widen",
+  "-Xfuture",
+  "-Ywarn-unused-import",
+  "-encoding",
+  "UTF-8"
+)
 
 resolvers ++= Seq(
   "SnapSwap repo" at "https://dev.snapswap.vc/artifactory/libs-release/",
@@ -14,13 +30,13 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
-  val akkaV = "2.4.2"
+  val akkaV = "2.4.5"
   Seq(
     "com.typesafe.akka" %% "akka-http-core" % akkaV,
     "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaV,
-    "joda-time" % "joda-time" % "2.9.1",
+    "joda-time" % "joda-time" % "2.9.3",
     "org.joda" % "joda-convert" % "1.8.1",
-    "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+    "org.scalatest" %% "scalatest" % "2.2.6" % "test"
   )
 }
 
