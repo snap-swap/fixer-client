@@ -1,12 +1,10 @@
 package com.snapswap.fixer
 
+import scala.concurrent.Future
+import org.joda.time.LocalDate
 import com.snapswap.fixer.model.FxData
 
-import scala.concurrent.Future
-
-/**
-  * Created by greenhost on 07/12/15.
-  */
 trait FixerClient {
   def latestRates(base: String, counters: Set[String]): Future[FxData]
+  def ratesAsOf(date: LocalDate, base: String, counters: Set[String]): Future[FxData]
 }

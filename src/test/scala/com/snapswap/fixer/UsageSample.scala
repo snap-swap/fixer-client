@@ -5,6 +5,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import org.scalatest.{Matchers, AsyncFlatSpec}
+import org.joda.time.{LocalDate, DateTimeZone}
 import com.snapswap.fixer.error.FixerAPIError
 import com.snapswap.fixer.model.FxData
 
@@ -22,6 +23,15 @@ class UsageSample extends AsyncFlatSpec with Matchers {
     import setup._
     recoverToSucceededIf[FixerAPIError] {
       fixerClient.latestRates("UUUSSSDDD", Set("EUR", "GBP"))
+    }
+  }
+  it should "get rates as of EOD of a specific date" in {
+    import setup._
+    val pastDate = LocalDate.now(DateTimeZone.UTC).minusWeeks(1)
+    fixerClient.ratesAsOf(pastDate, "GBP", Set("EUR")) map { result =>
+      result shouldBe a[FxData]
+      print(result)
+      result.asOf shouldBe pastDate.toDateTimeAtStartOfDay(DateTimeZone.UTC)
     }
   }
 

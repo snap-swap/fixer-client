@@ -1,5 +1,8 @@
 package com.snapswap.fixer
 
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.Http
@@ -9,20 +12,18 @@ import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
+import spray.json._
+import org.joda.time.{DateTime, DateTimeZone, LocalDate}
+import org.joda.time.format.ISODateTimeFormat
 import com.snapswap.fixer.error.{RequestFailed, UnexpectedResponse}
 import com.snapswap.fixer.model.FxData
-import org.joda.time.{DateTime, DateTimeZone}
-import spray.json.{JsValue, _}
-
-import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.util.{Failure, Success}
 
 class FixerClientImpl()(implicit val system: ActorSystem, val materializer: Materializer) extends FixerClient {
 
   import system.dispatcher
 
   private val log = Logging(system, this.getClass)
+  private val `yyyy-MM-dd` = ISODateTimeFormat.yearMonthDay()
 
   protected val baseURL = "/"
 
@@ -43,6 +44,26 @@ class FixerClientImpl()(implicit val system: ActorSystem, val materializer: Mate
       import com.snapswap.fixer.FixerUnmarshaller._
 
       get("latest", Map("base" -> base, "symbols" -> counters.mkString(","))) { json =>
+        if (json.convertTo[FxData].currencies == counters + base) {
+          json.convertTo[FxData]
+        } else {
+          throw UnexpectedResponse("Unexpected currencies in response")
+        }
+      }
+    }
+  }
+
+  override def ratesAsOf(date: LocalDate, base: String, counters: Set[String]): Future[FxData] = {
+    if (counters.isEmpty) {
+      Future.successful(
+        FxData(
+          base = base,
+          asOf = date.toDateTimeAtStartOfDay(DateTimeZone.UTC),
+          rates = Map()
+        ))
+    } else {
+      import com.snapswap.fixer.FixerUnmarshaller._
+      get(`yyyy-MM-dd`.print(date), Map("base" -> base, "symbols" -> counters.mkString(","))) { json =>
         if (json.convertTo[FxData].currencies == counters + base) {
           json.convertTo[FxData]
         } else {
