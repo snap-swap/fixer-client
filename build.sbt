@@ -2,9 +2,11 @@ name := "fixer-client"
 
 organization := "com.snapswap"
 
-version := "1.0.3"
+version := "1.0.4"
 
 scalaVersion := "2.11.8"
+
+crossScalaVersions := Seq("2.11.8", "2.12.7")
 
 scalacOptions := Seq(
   "-feature",
@@ -33,10 +35,10 @@ libraryDependencies ++= {
   val akkaHttpV = "10.0.10"
   Seq(
     "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV,
-    "joda-time" % "joda-time" % "2.9.4",
-    "org.joda" % "joda-convert" % "1.8.1",
-    "com.google.code.findbugs" % "jsr305" % "3.0.1" % "provided",
-    "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+    "joda-time" % "joda-time" % "2.10.1",
+    "org.joda" % "joda-convert" % "2.1.2",
+    "com.google.code.findbugs" % "jsr305" % "3.0.2" % "provided",
+    "org.scalatest" %% "scalatest" % "3.0.5" % "test"
   )
 }
 
@@ -50,7 +52,7 @@ lazy val root = (project in file(".")).
   settings(testOptions in Test := Seq(Tests.Filter(testNotUsageSampleFilter)))
 
 lazy val unitTest = taskKey[Unit]("Unit tests task")
-unitTest <<= test in Test
-test <<= (test in UsageSample).dependsOn(unitTest)
+unitTest := (test in Test).value
+test := (test in UsageSample).dependsOn(unitTest).value
 
 fork in Test := true

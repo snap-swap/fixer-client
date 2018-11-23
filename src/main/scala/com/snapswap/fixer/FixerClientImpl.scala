@@ -18,18 +18,20 @@ import org.joda.time.format.ISODateTimeFormat
 import com.snapswap.fixer.error.{RequestFailed, UnexpectedResponse}
 import com.snapswap.fixer.model.FxData
 
-class FixerClientImpl()(implicit val system: ActorSystem, val materializer: Materializer) extends FixerClient {
+class FixerClientImpl(
+                       accessKey: String,
+                       apiHost: String = "data.fixer.io",
+                       apiBase: String = "/api"
+                     )(implicit val system: ActorSystem, val materializer: Materializer) extends FixerClient {
 
   import system.dispatcher
 
   private val log = Logging(system, this.getClass)
   private val `yyyy-MM-dd` = ISODateTimeFormat.yearMonthDay()
 
-  protected val baseURL = "/"
-
   private lazy val fixerConnectionFlow =
     Http()
-      .cachedHostConnectionPool[Unit]("api.fixer.io", 80, settings = ConnectionPoolSettings(system.settings.config))
+      .cachedHostConnectionPoolHttps[Unit](apiHost, settings = ConnectionPoolSettings(system.settings.config))
       .log("fixer")
 
   override def latestRates(base: String, counters: Set[String]): Future[FxData] = {
@@ -82,7 +84,7 @@ class FixerClientImpl()(implicit val system: ActorSystem, val materializer: Mate
     }.runWith(Sink.head)
 
   private def get[T](path: String, query: Map[String, String])(parser: JsValue => T): Future[T] = {
-    val url = baseURL + path + parameters(query)
+    val url = (if (apiBase.endsWith("/")) apiBase else apiBase + "/") + path + parameters(query)
     val request = Get(url)
 
     makeRequest(
@@ -104,10 +106,6 @@ class FixerClientImpl()(implicit val system: ActorSystem, val materializer: Mate
   }
 
   private def parameters[T](query: Map[String, String]): String = {
-    if (query.isEmpty) {
-      ""
-    } else {
-      "?" + query.map(tup => s"${tup._1}=${tup._2}").mkString("&")
-    }
+    s"?access_key=$accessKey&" + query.map(tup => s"${tup._1}=${tup._2}").mkString("&")
   }
 }

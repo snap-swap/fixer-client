@@ -11,6 +11,8 @@ import com.snapswap.fixer.model.FxData
 
 class UsageSample extends AsyncFlatSpec with Matchers {
 
+  val fixerAccessKey = "REPLACE WITH YOUR KEY"
+
   implicit val timeout: Timeout = 1.minute
 
   "FixerClient" should "handle success response" in {
@@ -38,6 +40,6 @@ class UsageSample extends AsyncFlatSpec with Matchers {
   object setup {
     private implicit val system = ActorSystem("UsageSample")
     private implicit val materializer = ActorMaterializer()
-    val fixerClient = new FixerClientImpl()
+    val fixerClient = new FixerClientImpl(fixerAccessKey)
   }
 }
