@@ -25,7 +25,7 @@ class FixerUnmarshallerSpec extends FlatSpec with Matchers {
   }
 
   it should "parse error response" in {
-    val str = """{"error":"Invalid base"}"""
+    val str = """{"success":false,"error":{"code":201,"type":"invalid_base_currency"}}"""
     val json = str.parseJson
 
     intercept[FixerAPIError] {
