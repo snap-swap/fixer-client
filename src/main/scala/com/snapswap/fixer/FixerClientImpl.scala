@@ -1,8 +1,5 @@
 package com.snapswap.fixer
 
-import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.util.{Failure, Success}
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.Http
@@ -12,17 +9,22 @@ import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
-import spray.json._
-import org.joda.time.{DateTime, DateTimeZone, LocalDate}
-import org.joda.time.format.ISODateTimeFormat
 import com.snapswap.fixer.error.{RequestFailed, UnexpectedResponse}
 import com.snapswap.fixer.model.FxData
+import org.joda.time.format.ISODateTimeFormat
+import org.joda.time.{DateTime, DateTimeZone, LocalDate}
+import spray.json._
 
-class FixerClientImpl(
-                       accessKey: String,
-                       apiHost: String = "data.fixer.io",
-                       apiBase: String = "/api"
-                     )(implicit val system: ActorSystem, val materializer: Materializer) extends FixerClient {
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.util.{Failure, Success}
+
+class FixerClientImpl(accessKey: String,
+                      apiHost: String = "data.fixer.io",
+                      apiBase: String = "/api")
+                     (implicit val system: ActorSystem,
+                      val materializer: Materializer)
+  extends FixerClient {
 
   import system.dispatcher
 
@@ -31,8 +33,16 @@ class FixerClientImpl(
 
   private lazy val fixerConnectionFlow =
     Http()
-      .cachedHostConnectionPoolHttps[Unit](apiHost, settings = ConnectionPoolSettings(system.settings.config))
+      .cachedHostConnectionPool[Unit](apiHost, settings = ConnectionPoolSettings(system.settings.config))
       .log("fixer")
+
+  override def latestRatesEUR(): Future[FxData] = {
+    import com.snapswap.fixer.FixerUnmarshaller._
+
+    get("latest", Map.empty) { json =>
+      json.convertTo[FxData]
+    }
+  }
 
   override def latestRates(base: String, counters: Set[String]): Future[FxData] = {
     if (counters.isEmpty) {
@@ -52,6 +62,14 @@ class FixerClientImpl(
           throw UnexpectedResponse("Unexpected currencies in response")
         }
       }
+    }
+  }
+
+  override def ratesAsOfEUR(date: LocalDate): Future[FxData] = {
+    import com.snapswap.fixer.FixerUnmarshaller._
+
+    get(`yyyy-MM-dd`.print(date), Map.empty) { json =>
+      json.convertTo[FxData]
     }
   }
 
